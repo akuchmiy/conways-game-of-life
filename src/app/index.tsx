@@ -1,9 +1,9 @@
 import React from 'react'
-import 'app/styles/index.css'
 import { withProviders } from './providers'
+import { Routing } from '../pages'
 
 function App() {
-	return <div>App</div>
+	return <Routing />
 }
 
 export default withProviders(App)
