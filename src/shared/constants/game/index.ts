@@ -1,4 +1,4 @@
-export const GAME_SPEED = 200
+export const GAME_SPEED = 50
 
 export const COUNT_NEIGHBORS_OFFSET = 1
 

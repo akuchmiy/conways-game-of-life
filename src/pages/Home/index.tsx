@@ -3,28 +3,26 @@ import styled from 'styled-components'
 import { ThemeToggle } from 'features/ToggleTheme'
 import { GameOfLife } from 'features/GameOfLife'
 import { TileSizeControls } from 'features/TileSizeControls'
-import { tiles, layout } from 'shared/constants'
+import { Container } from 'shared/ui/Container'
+import { tiles } from 'shared/constants'
 import { useContainerWidth } from 'shared/hooks/useContainerWidth'
 
-const Container = styled.div`
-	position: relative;
-	width: min(
-		${layout.CONTAINER_PERCENTAGE_FROM_WINDOW * 100}%,
-		${layout.MAX_CONTAINER_WIDTH}px
-	);
+const StyledContainer = styled(Container)`
 	padding-top: 3em;
-	margin: 0 auto;
-	text-align: center;
 `
 
-const AbsoluteToggle = styled(ThemeToggle)`
+const StyledThemeToggle = styled(ThemeToggle)`
 	position: absolute;
 	top: 1em;
 	right: 0;
 `
 
 const StyledGame = styled(GameOfLife)`
-	margin: 0 auto 0;
+	margin: 0 auto 0.5em;
+`
+
+const Title = styled.h1`
+	text-align: center;
 `
 
 const StyledTileControls = styled(TileSizeControls)`
@@ -42,14 +40,15 @@ export const Home = () => {
 	}
 
 	return (
-		<Container>
+		<StyledContainer>
 			<StyledGame
 				width={containerWidth}
 				height={containerWidth}
 				tileSize={size}
 			/>
+			<Title>Current size: {size}</Title>
 			<StyledTileControls size={size} changeSize={changeSize} />
-			<AbsoluteToggle />
-		</Container>
+			<StyledThemeToggle />
+		</StyledContainer>
 	)
 }
