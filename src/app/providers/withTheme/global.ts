@@ -20,6 +20,10 @@ export const GlobalStyle = createGlobalStyle<ThemeType>`
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+		
+		min-height: 100vh;
+		overflow-x: hidden;
+		
     color: 	${(props) => props.theme.color};
 		background-color: ${(props) => props.theme.bg};
 
@@ -30,4 +34,8 @@ export const GlobalStyle = createGlobalStyle<ThemeType>`
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
   }
+	
+	#root {
+		min-height: 100vh;
+	}
 `

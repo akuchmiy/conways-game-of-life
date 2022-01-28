@@ -2,7 +2,7 @@ import React from 'react'
 import { ThemeProvider } from 'styled-components'
 import { GlobalStyle } from './global'
 import { useDarkTheme } from 'shared/hooks/useDarkTheme'
-import { themeModel } from 'features/toggle-theme'
+import { themeModel } from 'features/ToggleTheme'
 
 export const withTheme = (component: () => React.ReactNode) =>
 	function WithTheme() {
