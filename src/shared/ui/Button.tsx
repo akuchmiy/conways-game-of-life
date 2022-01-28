@@ -34,19 +34,36 @@ const StyledButton = styled.button`
 		background-color: ${(props) => props.theme.color};
 
 		transform: scaleX(0);
-		transform-origin: left;
+		transform-origin: right;
 		transition: transform 200ms ease;
 	}
 
 	&:hover::before,
 	&:focus::before {
+		transform-origin: left;
 		transform: scaleX(1);
+	}
+
+	&[disabled] {
+		cursor: default;
+		color: gray;
+		border-color: gray;
+	}
+
+	&[disabled]::before {
+		display: none;
+	}
+
+	&[disabled]:is(:hover, :focus) {
+		color: gray;
+		border-color: gray;
 	}
 `
 
-export const Button: FC<HTMLAttributes<HTMLButtonElement>> = ({
-	children,
-	...rest
-}) => {
+interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
+	disabled?: boolean
+}
+
+export const Button: FC<ButtonProps> = ({ children, ...rest }) => {
 	return <StyledButton {...rest}>{children}</StyledButton>
 }

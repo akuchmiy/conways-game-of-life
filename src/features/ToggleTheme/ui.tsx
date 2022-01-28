@@ -2,6 +2,7 @@ import React, { FC, useContext } from 'react'
 import { ToggleThemeContext } from './model'
 import { themes } from 'shared/constants'
 import styled, { useTheme } from 'styled-components'
+import cn from 'classnames'
 
 const Switcher = styled.button`
 	cursor: pointer;
@@ -30,6 +31,10 @@ const Switcher = styled.button`
 		transition: background-color 200ms ease, left 200ms, transform 200ms;
 	}
 
+	&:focus::before {
+		box-shadow: 0 0 3px 4px #ff97aa;
+	}
+
 	&.active::before {
 		left: 100%;
 
@@ -37,14 +42,18 @@ const Switcher = styled.button`
 	}
 `
 
-export const ThemeToggle: FC = () => {
+interface ThemeToggleProps {
+	className?: string
+}
+
+export const ThemeToggle: FC<ThemeToggleProps> = ({ className = '' }) => {
 	const theme = useTheme()
 	const toggleTheme = useContext(ToggleThemeContext)
 
 	return (
 		<Switcher
 			onClick={toggleTheme}
-			className={theme == themes.dark ? 'active' : ''}
+			className={cn({ active: theme == themes.dark }, className)}
 			aria-label={'Toggle different theme'}
 		/>
 	)
