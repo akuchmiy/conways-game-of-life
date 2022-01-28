@@ -30,7 +30,7 @@ export const GameGrid: FC<GameGridProps> = ({
 		const newGrid = createGameGrid({ tilesX, tilesY, tileSize, random: true })
 
 		setGrid(newGrid)
-	}, [ctx, tileSize])
+	}, [ctx, tileSize, tilesX, tilesY])
 
 	useEffect(() => {
 		if (!grid) return
