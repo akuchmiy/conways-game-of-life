@@ -11,15 +11,21 @@ const Controls = styled.div`
 
 interface TileSizeControlsProps {
 	size: number
-	changeSize: (direction: 'UP' | 'DOWN') => void
+	setSize: (size: number) => void
 	className?: string
 }
 
 export const TileSizeControls: FC<TileSizeControlsProps> = ({
 	size,
-	changeSize,
+	setSize,
 	className = '',
 }) => {
+	function changeSize(direction: 'UP' | 'DOWN') {
+		if (direction === 'UP') return setSize(size + tiles.TILE_SIZE_STEP)
+
+		setSize(size - tiles.TILE_SIZE_STEP)
+	}
+
 	return (
 		<Controls className={className}>
 			<Button

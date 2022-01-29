@@ -5,56 +5,130 @@ import {
 	drawGrid,
 	generateUpdatedGrid,
 	Grid,
+	updateTileOnCoordinates,
 } from '../lib'
 import { TileStatus } from 'shared/domain'
 import { useTheme } from 'styled-components'
 import { game } from 'shared/constants'
+import { useCanvasContext } from '../model'
 
 interface GameGridProps {
-	ctx: CanvasRenderingContext2D
+	canvas: HTMLCanvasElement
 	tilesX: number
 	tilesY: number
 	tileSize: number
+	isPlaying: boolean
+}
+
+enum Buttons {
+	LEFT = 0,
+	MIDDLE = 1,
+	RIGHT = 2,
 }
 
 export const GameGrid: FC<GameGridProps> = ({
-	ctx,
+	canvas,
 	tilesX,
 	tilesY,
 	tileSize,
+	isPlaying,
 }) => {
-	const [grid, setGrid] = useState<Grid | null>(null)
+	const ctx = useCanvasContext(canvas)
+	const [grid, setGrid] = useState<Grid>([])
 	const theme = useTheme()
 
-	useEffect(() => {
-		const newGrid = createGameGrid({ tilesX, tilesY, tileSize, random: true })
+	useEffect(
+		function createANewGridOnNewContextAndProps() {
+			const newGrid = createGameGrid({ tilesX, tilesY, tileSize, random: true })
 
-		setGrid(newGrid)
-	}, [ctx, tileSize, tilesX, tilesY])
+			setGrid(newGrid)
+		},
+		[ctx, tileSize, tilesX, tilesY]
+	)
 
-	useEffect(() => {
-		if (!grid) return
+	useEffect(
+		function drawGridAndUpdateOnTimeout() {
+			if (!grid.length) return
 
-		drawGrid({
-			ctx,
-			grid,
-			tileSize,
-			colors: { [TileStatus.ALIVE]: theme.color, [TileStatus.DEAD]: theme.bg },
-		})
+			drawGrid({
+				ctx,
+				grid,
+				tileSize,
+				colors: {
+					[TileStatus.ALIVE]: theme.color,
+					[TileStatus.DEAD]: theme.bg,
+				},
+			})
 
-		const updateGrid = () => {
-			const updatedGrid = generateUpdatedGrid(grid)
+			if (!isPlaying) return () => clearGrid(ctx)
 
-			setGrid(updatedGrid)
-		}
+			const updateGrid = () => {
+				const updatedGrid = generateUpdatedGrid(grid)
 
-		const timeoutId = setTimeout(updateGrid, game.GAME_SPEED)
+				setGrid(updatedGrid)
+			}
 
-		return () => {
-			clearGrid(ctx)
-			clearTimeout(timeoutId)
-		}
-	}, [ctx, grid, theme])
+			const timeoutId = setTimeout(updateGrid, game.GAME_SPEED)
+
+			return () => {
+				clearGrid(ctx)
+				clearTimeout(timeoutId)
+			}
+		},
+		[ctx, grid, theme, isPlaying]
+	)
+
+	useEffect(
+		function attachCanvasOnMouseMoveListener() {
+			if (!grid.length) return
+
+			let isMouseDown = false
+			let mouseButton = Buttons.LEFT
+
+			const onMouseDown = (event: MouseEvent) => {
+				mouseButton = event.button
+				isMouseDown = true
+			}
+			const onMouseUp = () => (isMouseDown = false)
+
+			const onMouseMove = (event: MouseEvent) => {
+				if (!isMouseDown || mouseButton === Buttons.MIDDLE) return
+
+				setGrid((grid) => {
+					if (!grid || !grid.length) return grid
+
+					const { x: canvasX, y: canvasY } = canvas.getBoundingClientRect()
+					const coords = {
+						x: event.clientX - canvasX,
+						y: event.clientY - canvasY,
+					}
+
+					return updateTileOnCoordinates({
+						grid,
+						coords,
+						tileSize,
+						tileStatus:
+							mouseButton === Buttons.LEFT ? TileStatus.ALIVE : TileStatus.DEAD,
+					})
+				})
+			}
+
+			const disableContextMenu = (event: MouseEvent) => event.preventDefault()
+
+			canvas.addEventListener('mousedown', onMouseDown)
+			canvas.addEventListener('mouseup', onMouseUp)
+			canvas.addEventListener('mousemove', onMouseMove)
+			canvas.addEventListener('contextmenu', disableContextMenu)
+
+			return () => {
+				canvas.removeEventListener('mousedown', onMouseDown)
+				canvas.removeEventListener('mouseup', onMouseUp)
+				canvas.removeEventListener('mousemove', onMouseMove)
+				canvas.removeEventListener('contextmenu', disableContextMenu)
+			}
+		},
+		[canvas, ctx, tileSize]
+	)
 
 	return null
 }

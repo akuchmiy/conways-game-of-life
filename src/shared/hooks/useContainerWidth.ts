@@ -10,8 +10,6 @@ export function useContainerWidth() {
 				window.innerWidth * layout.CONTAINER_PERCENTAGE_FROM_WINDOW
 
 			const newWidth = Math.min(percentage, layout.MAX_CONTAINER_WIDTH)
-
-			console.log(window.innerWidth)
 			setWidth(newWidth)
 		}
 

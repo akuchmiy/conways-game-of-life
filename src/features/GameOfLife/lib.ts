@@ -1,4 +1,4 @@
-import { GameTile, TileStatus } from 'shared/domain'
+import { Coordinates, GameTile, TileStatus } from 'shared/domain'
 import { drawTile } from 'entities/Tile'
 import { game } from 'shared/constants'
 
@@ -39,7 +39,7 @@ export function generateUpdatedGrid(grid: Grid): Grid {
 		tileRow.map((tile, col) => {
 			return {
 				coords: tile.coords,
-				status: getTileNextStatus(grid, row, col),
+				status: getTileNextStatus(grid, row, col, tile.status),
 			}
 		})
 	)
@@ -65,23 +65,59 @@ export function clearGrid(ctx: CanvasRenderingContext2D) {
 	ctx.clearRect(0, 0, 999999, 999999)
 }
 
-function getTileNextStatus(grid: Grid, row: number, col: number): TileStatus {
-	const aliveNeighbors = countAliveTileNeighbors(grid, row, col)
+interface DrawTileOnCoordinatesProps {
+	grid: Grid
+	coords: Coordinates
+	tileSize: number
+	tileStatus: TileStatus
+}
 
-	if (game.NEIGHBORS_TO_SURVIVE.includes(aliveNeighbors))
+export function updateTileOnCoordinates({
+	grid,
+	coords,
+	tileSize,
+	tileStatus,
+}: DrawTileOnCoordinatesProps): Grid {
+	const tileX = Math.floor(coords.x / tileSize)
+	const tileY = Math.floor(coords.y / tileSize)
+
+	if (tileX < 0 || tileX >= grid[0].length || tileY < 0 || tileY >= grid.length)
+		return grid
+
+	const newGrid = [...grid]
+
+	newGrid[tileY][tileX].status = tileStatus
+
+	return newGrid
+}
+
+function getTileNextStatus(
+	grid: Grid,
+	row: number,
+	col: number,
+	status: TileStatus
+): TileStatus {
+	const aliveNeighbors = countAliveTileNeighbors(grid, row, col, status)
+
+	if (game.CELLS_TO_SURVIVE[status].includes(aliveNeighbors))
 		return TileStatus.ALIVE
 
 	return TileStatus.DEAD
 }
 
-function countAliveTileNeighbors(grid: Grid, row: number, col: number): number {
+function countAliveTileNeighbors(
+	grid: Grid,
+	row: number,
+	col: number,
+	status: TileStatus
+): number {
 	const { rowFrom, rowTo, colFrom, colTo } = calculateNeighborsBoxBoundaries(
 		grid,
 		row,
 		col
 	)
 
-	let aliveCounter = -1 // actual tile in center does not count
+	let aliveCounter = status === TileStatus.ALIVE ? -1 : 0
 
 	for (let rowI = rowFrom; rowI <= rowTo; rowI++) {
 		for (let colI = colFrom; colI <= colTo; colI++) {

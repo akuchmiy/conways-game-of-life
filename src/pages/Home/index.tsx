@@ -33,21 +33,16 @@ export const Home = () => {
 	const [size, setSize] = useState(tiles.MIN_TILE_SIZE)
 	const containerWidth = useContainerWidth()
 
-	function changeSize(direction: 'UP' | 'DOWN') {
-		if (direction === 'UP') return setSize(size + tiles.TILE_SIZE_STEP)
-
-		setSize(size - tiles.TILE_SIZE_STEP)
-	}
-
 	return (
 		<StyledContainer>
 			<StyledGame
 				width={containerWidth}
 				height={containerWidth}
 				tileSize={size}
+				isPlaying={true}
 			/>
 			<Title>Current size: {size}</Title>
-			<StyledTileControls size={size} changeSize={changeSize} />
+			<StyledTileControls size={size} setSize={setSize} />
 			<StyledThemeToggle />
 		</StyledContainer>
 	)

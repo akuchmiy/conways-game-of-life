@@ -1,6 +1,5 @@
 import React, { FC, useRef } from 'react'
 import styled from 'styled-components'
-import { useCanvasContext } from '../model'
 import { GameGrid } from './GameGrid'
 
 const StyledCanvas = styled.canvas`
@@ -11,18 +10,19 @@ const StyledCanvas = styled.canvas`
 interface GameOfLifeProps {
 	width: number
 	height: number
-	className?: string
 	tileSize: number
+	isPlaying?: boolean
+	className?: string
 }
 
 export const GameOfLife: FC<GameOfLifeProps> = ({
 	width,
 	height,
 	tileSize,
+	isPlaying = true,
 	className = '',
 }) => {
 	const canvas = useRef<HTMLCanvasElement>(null)
-	const ctx = useCanvasContext(canvas.current)
 
 	const tilesX = width / tileSize
 	const tilesY = height / tileSize
@@ -35,12 +35,13 @@ export const GameOfLife: FC<GameOfLifeProps> = ({
 				ref={canvas}
 				className={className}
 			/>
-			{ctx && (
+			{canvas.current && (
 				<GameGrid
-					ctx={ctx}
+					canvas={canvas.current}
 					tilesX={tilesX}
 					tilesY={tilesY}
 					tileSize={tileSize}
+					isPlaying={isPlaying}
 				/>
 			)}
 		</>
