@@ -5,5 +5,6 @@ export function drawTile(
 	coords: Coordinates,
 	size: number
 ) {
+	ctx.strokeRect(coords.x, coords.y, size, size)
 	ctx.fillRect(coords.x, coords.y, size, size)
 }

@@ -1,6 +1,7 @@
 import { Coordinates, GameTile, TileStatus } from 'shared/domain'
 import { drawTile } from 'entities/Tile'
-import { game } from 'shared/constants'
+import { GAME, TILES } from 'shared/constants'
+import { TILE_STROKE_STYLE } from '../../shared/constants/tiles'
 
 export type Grid = GameTile[][]
 
@@ -56,6 +57,7 @@ export function drawGrid({ ctx, grid, tileSize, colors }: DrawGridParams) {
 	grid.forEach((tileRow) => {
 		tileRow.forEach((tile) => {
 			ctx.fillStyle = colors[tile.status]
+			ctx.strokeStyle = TILES.TILE_STROKE_STYLE
 			drawTile(ctx, tile.coords, tileSize)
 		})
 	})
@@ -65,7 +67,7 @@ export function clearGrid(ctx: CanvasRenderingContext2D) {
 	ctx.clearRect(0, 0, 999999, 999999)
 }
 
-interface DrawTileOnCoordinatesProps {
+interface UpdateTileOnCoordinatesProps {
 	grid: Grid
 	coords: Coordinates
 	tileSize: number
@@ -77,7 +79,7 @@ export function updateTileOnCoordinates({
 	coords,
 	tileSize,
 	tileStatus,
-}: DrawTileOnCoordinatesProps): Grid {
+}: UpdateTileOnCoordinatesProps): Grid {
 	const tileX = Math.floor(coords.x / tileSize)
 	const tileY = Math.floor(coords.y / tileSize)
 
@@ -99,7 +101,7 @@ function getTileNextStatus(
 ): TileStatus {
 	const aliveNeighbors = countAliveTileNeighbors(grid, row, col, status)
 
-	if (game.CELLS_TO_SURVIVE[status].includes(aliveNeighbors))
+	if (GAME.CELLS_TO_SURVIVE[status].includes(aliveNeighbors))
 		return TileStatus.ALIVE
 
 	return TileStatus.DEAD
@@ -132,10 +134,10 @@ function calculateNeighborsBoxBoundaries(grid: Grid, row: number, col: number) {
 	const maxRow = grid.length - 1
 	const maxCol = grid[0].length - 1
 
-	const rowFrom = Math.max(row - game.COUNT_NEIGHBORS_OFFSET, 0)
-	const colFrom = Math.max(col - game.COUNT_NEIGHBORS_OFFSET, 0)
-	const rowTo = Math.min(row + game.COUNT_NEIGHBORS_OFFSET, maxRow)
-	const colTo = Math.min(col + game.COUNT_NEIGHBORS_OFFSET, maxCol)
+	const rowFrom = Math.max(row - GAME.COUNT_NEIGHBORS_OFFSET, 0)
+	const colFrom = Math.max(col - GAME.COUNT_NEIGHBORS_OFFSET, 0)
+	const rowTo = Math.min(row + GAME.COUNT_NEIGHBORS_OFFSET, maxRow)
+	const colTo = Math.min(col + GAME.COUNT_NEIGHBORS_OFFSET, maxCol)
 
 	return {
 		rowFrom,

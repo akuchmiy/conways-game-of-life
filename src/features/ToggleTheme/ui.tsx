@@ -1,6 +1,6 @@
 import React, { FC, useContext } from 'react'
 import { ToggleThemeContext } from './model'
-import { themes } from 'shared/constants'
+import { THEMES } from 'shared/constants'
 import styled, { useTheme } from 'styled-components'
 import cn from 'classnames'
 
@@ -53,7 +53,7 @@ export const ThemeToggle: FC<ThemeToggleProps> = ({ className = '' }) => {
 	return (
 		<Switcher
 			onClick={toggleTheme}
-			className={cn({ active: theme == themes.dark }, className)}
+			className={cn({ active: theme == THEMES.dark }, className)}
 			aria-label={'Toggle different theme'}
 		/>
 	)

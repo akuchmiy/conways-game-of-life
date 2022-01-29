@@ -9,7 +9,7 @@ import {
 } from '../lib'
 import { TileStatus } from 'shared/domain'
 import { useTheme } from 'styled-components'
-import { game } from 'shared/constants'
+import { GAME } from 'shared/constants'
 import { useCanvasContext } from '../model'
 
 interface GameGridProps {
@@ -68,7 +68,7 @@ export const GameGrid: FC<GameGridProps> = ({
 				setGrid(updatedGrid)
 			}
 
-			const timeoutId = setTimeout(updateGrid, game.GAME_SPEED)
+			const timeoutId = setTimeout(updateGrid, GAME.GAME_SPEED)
 
 			return () => {
 				clearGrid(ctx)

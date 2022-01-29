@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
 import { Button } from 'shared/ui/Button'
-import { tiles } from 'shared/constants'
+import { TILES } from 'shared/constants'
 import styled from 'styled-components'
 
 const Controls = styled.div`
@@ -21,22 +21,22 @@ export const TileSizeControls: FC<TileSizeControlsProps> = ({
 	className = '',
 }) => {
 	function changeSize(direction: 'UP' | 'DOWN') {
-		if (direction === 'UP') return setSize(size + tiles.TILE_SIZE_STEP)
+		if (direction === 'UP') return setSize(size + TILES.TILE_SIZE_STEP)
 
-		setSize(size - tiles.TILE_SIZE_STEP)
+		setSize(size - TILES.TILE_SIZE_STEP)
 	}
 
 	return (
 		<Controls className={className}>
 			<Button
 				onClick={() => changeSize('UP')}
-				disabled={size == tiles.MAX_TILE_SIZE}
+				disabled={size == TILES.MAX_TILE_SIZE}
 			>
 				Increase size
 			</Button>
 			<Button
 				onClick={() => changeSize('DOWN')}
-				disabled={size == tiles.MIN_TILE_SIZE}
+				disabled={size == TILES.MIN_TILE_SIZE}
 			>
 				Decrease size
 			</Button>

@@ -4,7 +4,7 @@ import { ThemeToggle } from 'features/ToggleTheme'
 import { GameOfLife } from 'features/GameOfLife'
 import { TileSizeControls } from 'features/TileSizeControls'
 import { Container } from 'shared/ui/Container'
-import { tiles } from 'shared/constants'
+import { TILES } from 'shared/constants'
 import { useContainerWidth } from 'shared/hooks/useContainerWidth'
 
 const StyledContainer = styled(Container)`
@@ -30,7 +30,7 @@ const StyledTileControls = styled(TileSizeControls)`
 `
 
 export const Home = () => {
-	const [size, setSize] = useState(tiles.MIN_TILE_SIZE)
+	const [size, setSize] = useState(TILES.MIN_TILE_SIZE)
 	const containerWidth = useContainerWidth()
 
 	return (
