@@ -30,7 +30,9 @@ const StyledTileControls = styled(TileSizeControls)`
 `
 
 export const Home = () => {
-	const [size, setSize] = useState(TILES.MIN_TILE_SIZE)
+	const [size, setSize] = useState(
+		TILES.MIN_TILE_SIZE + TILES.TILE_SIZE_STEP * 2
+	)
 	const containerWidth = useContainerWidth()
 
 	return (

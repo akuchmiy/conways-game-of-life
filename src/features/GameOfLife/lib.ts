@@ -1,9 +1,17 @@
 import { Coordinates, GameTile, TileStatus } from 'shared/domain'
 import { drawTile } from 'entities/Tile'
 import { GAME, TILES } from 'shared/constants'
-import { TILE_STROKE_STYLE } from '../../shared/constants/tiles'
 
 export type Grid = GameTile[][]
+
+type GridTileNeighborsBoundary = {
+	rowFrom: number
+	rowTo: number
+	colFrom: number
+	colTo: number
+}
+
+export type GridTileNeighborsBoundaries = GridTileNeighborsBoundary[][]
 
 interface CreateGameGridParams {
 	tilesX: number
@@ -35,12 +43,31 @@ export function createGameGrid({
 	return grid
 }
 
-export function generateUpdatedGrid(grid: Grid): Grid {
+export function createGridNeighborsBoundaries(
+	grid: Grid
+): GridTileNeighborsBoundaries {
+	return grid.map((tileRow, row) =>
+		tileRow.map((tile, col) => {
+			return calculateNeighborsBoxBoundaries(grid, row, col)
+		})
+	)
+}
+
+export function generateUpdatedGrid(
+	grid: Grid,
+	neighborsBoundaries: GridTileNeighborsBoundaries
+): Grid {
 	return grid.map((tileRow, row) =>
 		tileRow.map((tile, col) => {
 			return {
 				coords: tile.coords,
-				status: getTileNextStatus(grid, row, col, tile.status),
+				status: getTileNextStatus(
+					grid,
+					neighborsBoundaries,
+					row,
+					col,
+					tile.status
+				),
 			}
 		})
 	)
@@ -63,10 +90,6 @@ export function drawGrid({ ctx, grid, tileSize, colors }: DrawGridParams) {
 	})
 }
 
-export function clearGrid(ctx: CanvasRenderingContext2D) {
-	ctx.clearRect(0, 0, 999999, 999999)
-}
-
 interface UpdateTileOnCoordinatesProps {
 	grid: Grid
 	coords: Coordinates
@@ -86,8 +109,9 @@ export function updateTileOnCoordinates({
 	if (tileX < 0 || tileX >= grid[0].length || tileY < 0 || tileY >= grid.length)
 		return grid
 
-	const newGrid = [...grid]
+	if (grid[tileY][tileX].status === tileStatus) return grid
 
+	const newGrid = [...grid]
 	newGrid[tileY][tileX].status = tileStatus
 
 	return newGrid
@@ -95,11 +119,18 @@ export function updateTileOnCoordinates({
 
 function getTileNextStatus(
 	grid: Grid,
+	neighborsBoundaries: GridTileNeighborsBoundaries,
 	row: number,
 	col: number,
 	status: TileStatus
 ): TileStatus {
-	const aliveNeighbors = countAliveTileNeighbors(grid, row, col, status)
+	const aliveNeighbors = countAliveTileNeighbors(
+		grid,
+		neighborsBoundaries,
+		row,
+		col,
+		status
+	)
 
 	if (GAME.CELLS_TO_SURVIVE[status].includes(aliveNeighbors))
 		return TileStatus.ALIVE
@@ -109,15 +140,12 @@ function getTileNextStatus(
 
 function countAliveTileNeighbors(
 	grid: Grid,
+	neighborsBoundaries: GridTileNeighborsBoundaries,
 	row: number,
 	col: number,
 	status: TileStatus
 ): number {
-	const { rowFrom, rowTo, colFrom, colTo } = calculateNeighborsBoxBoundaries(
-		grid,
-		row,
-		col
-	)
+	const { rowFrom, rowTo, colFrom, colTo } = neighborsBoundaries[row][col]
 
 	let aliveCounter = status === TileStatus.ALIVE ? -1 : 0
 
@@ -130,7 +158,11 @@ function countAliveTileNeighbors(
 	return aliveCounter
 }
 
-function calculateNeighborsBoxBoundaries(grid: Grid, row: number, col: number) {
+function calculateNeighborsBoxBoundaries(
+	grid: Grid,
+	row: number,
+	col: number
+): GridTileNeighborsBoundary {
 	const maxRow = grid.length - 1
 	const maxCol = grid[0].length - 1
 

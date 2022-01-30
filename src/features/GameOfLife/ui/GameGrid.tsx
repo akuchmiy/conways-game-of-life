@@ -1,10 +1,11 @@
 import { FC, useEffect, useState } from 'react'
 import {
-	clearGrid,
 	createGameGrid,
+	createGridNeighborsBoundaries,
 	drawGrid,
 	generateUpdatedGrid,
 	Grid,
+	GridTileNeighborsBoundaries,
 	updateTileOnCoordinates,
 } from '../lib'
 import { TileStatus } from 'shared/domain'
@@ -35,21 +36,23 @@ export const GameGrid: FC<GameGridProps> = ({
 }) => {
 	const ctx = useCanvasContext(canvas)
 	const [grid, setGrid] = useState<Grid>([])
+	const [gridTileNeighborsBoundaries, setGridTileNeighborsBoundaries] =
+		useState<GridTileNeighborsBoundaries>([])
 	const theme = useTheme()
 
 	useEffect(
-		function createANewGridOnNewContextAndProps() {
+		function createNewGrid() {
 			const newGrid = createGameGrid({ tilesX, tilesY, tileSize, random: true })
+			const newBoundaries = createGridNeighborsBoundaries(newGrid)
 
 			setGrid(newGrid)
+			setGridTileNeighborsBoundaries(newBoundaries)
 		},
 		[ctx, tileSize, tilesX, tilesY]
 	)
 
 	useEffect(
-		function drawGridAndUpdateOnTimeout() {
-			if (!grid.length) return
-
+		function drawNewGrid() {
 			drawGrid({
 				ctx,
 				grid,
@@ -59,23 +62,30 @@ export const GameGrid: FC<GameGridProps> = ({
 					[TileStatus.DEAD]: theme.bg,
 				},
 			})
+		},
+		[ctx, grid, theme]
+	)
 
-			if (!isPlaying) return () => clearGrid(ctx)
+	useEffect(
+		function updateGridOnTimeout() {
+			if (!grid.length || grid.length !== gridTileNeighborsBoundaries.length)
+				return
+			if (!isPlaying) return
 
 			const updateGrid = () => {
-				const updatedGrid = generateUpdatedGrid(grid)
+				const updatedGrid = generateUpdatedGrid(
+					grid,
+					gridTileNeighborsBoundaries
+				)
 
 				setGrid(updatedGrid)
 			}
 
 			const timeoutId = setTimeout(updateGrid, GAME.GAME_SPEED)
 
-			return () => {
-				clearGrid(ctx)
-				clearTimeout(timeoutId)
-			}
+			return () => clearTimeout(timeoutId)
 		},
-		[ctx, grid, theme, isPlaying]
+		[ctx, grid, gridTileNeighborsBoundaries, theme, isPlaying]
 	)
 
 	useEffect(
