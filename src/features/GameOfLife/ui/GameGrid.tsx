@@ -19,6 +19,7 @@ interface GameGridProps {
 	tilesY: number
 	tileSize: number
 	isPlaying: boolean
+	isClear: boolean
 }
 
 enum Buttons {
@@ -33,6 +34,7 @@ export const GameGrid: FC<GameGridProps> = ({
 	tilesY,
 	tileSize,
 	isPlaying,
+	isClear,
 }) => {
 	const ctx = useCanvasContext(canvas)
 	const [grid, setGrid] = useState<Grid>([])
@@ -42,13 +44,18 @@ export const GameGrid: FC<GameGridProps> = ({
 
 	useEffect(
 		function createNewGrid() {
-			const newGrid = createGameGrid({ tilesX, tilesY, tileSize, random: true })
+			const newGrid = createGameGrid({
+				tilesX,
+				tilesY,
+				tileSize,
+				random: !isClear,
+			})
 			const newBoundaries = createGridNeighborsBoundaries(newGrid)
 
 			setGrid(newGrid)
 			setGridTileNeighborsBoundaries(newBoundaries)
 		},
-		[ctx, tileSize, tilesX, tilesY]
+		[ctx, tileSize, tilesX, tilesY, isClear]
 	)
 
 	useEffect(

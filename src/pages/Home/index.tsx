@@ -6,6 +6,7 @@ import { TileSizeControls } from 'features/TileSizeControls'
 import { Container } from 'shared/ui/Container'
 import { TILES } from 'shared/constants'
 import { useContainerWidth } from 'shared/hooks/useContainerWidth'
+import { ToggleGamePlay } from '../../features/ToggleGamePlay'
 
 const StyledContainer = styled(Container)`
 	padding-top: 3em;
@@ -25,7 +26,9 @@ const Title = styled.h1`
 	text-align: center;
 `
 
-const StyledTileControls = styled(TileSizeControls)`
+const Controls = styled.div`
+	display: flex;
+	justify-content: space-between;
 	margin-top: 1em;
 `
 
@@ -33,6 +36,7 @@ export const Home = () => {
 	const [size, setSize] = useState(
 		TILES.MIN_TILE_SIZE + TILES.TILE_SIZE_STEP * 2
 	)
+	const [isPlaying, setIsPlaying] = useState(true)
 	const containerWidth = useContainerWidth()
 
 	return (
@@ -41,10 +45,13 @@ export const Home = () => {
 				width={containerWidth}
 				height={containerWidth}
 				tileSize={size}
-				isPlaying={true}
+				isPlaying={isPlaying}
 			/>
 			<Title>Current size: {size}</Title>
-			<StyledTileControls size={size} setSize={setSize} />
+			<Controls>
+				<ToggleGamePlay isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
+				<TileSizeControls size={size} setSize={setSize} />
+			</Controls>
 			<StyledThemeToggle />
 		</StyledContainer>
 	)

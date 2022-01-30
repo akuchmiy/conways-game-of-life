@@ -12,6 +12,7 @@ interface GameOfLifeProps {
 	height: number
 	tileSize: number
 	isPlaying?: boolean
+	isClear?: boolean
 	className?: string
 }
 
@@ -21,6 +22,7 @@ export const GameOfLife: FC<GameOfLifeProps> = ({
 	tileSize,
 	isPlaying = true,
 	className = '',
+	isClear = true,
 }) => {
 	const canvas = useRef<HTMLCanvasElement>(null)
 
@@ -42,6 +44,7 @@ export const GameOfLife: FC<GameOfLifeProps> = ({
 					tilesY={tilesY}
 					tileSize={tileSize}
 					isPlaying={isPlaying}
+					isClear={isClear}
 				/>
 			)}
 		</>
