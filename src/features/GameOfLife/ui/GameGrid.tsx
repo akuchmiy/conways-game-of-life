@@ -19,7 +19,7 @@ interface GameGridProps {
 	tilesY: number
 	tileSize: number
 	isPlaying: boolean
-	isClear: boolean
+	isInitialRandom: boolean
 }
 
 enum Buttons {
@@ -34,7 +34,7 @@ export const GameGrid: FC<GameGridProps> = ({
 	tilesY,
 	tileSize,
 	isPlaying,
-	isClear,
+	isInitialRandom,
 }) => {
 	const ctx = useCanvasContext(canvas)
 	const [grid, setGrid] = useState<Grid>([])
@@ -48,14 +48,14 @@ export const GameGrid: FC<GameGridProps> = ({
 				tilesX,
 				tilesY,
 				tileSize,
-				random: !isClear,
+				random: isInitialRandom,
 			})
 			const newBoundaries = createGridNeighborsBoundaries(newGrid)
 
 			setGrid(newGrid)
 			setGridTileNeighborsBoundaries(newBoundaries)
 		},
-		[ctx, tileSize, tilesX, tilesY, isClear]
+		[ctx, tileSize, tilesX, tilesY, isInitialRandom]
 	)
 
 	useEffect(
@@ -75,9 +75,12 @@ export const GameGrid: FC<GameGridProps> = ({
 
 	useEffect(
 		function updateGridOnTimeout() {
-			if (!grid.length || grid.length !== gridTileNeighborsBoundaries.length)
+			if (
+				!grid.length ||
+				grid.length !== gridTileNeighborsBoundaries.length ||
+				!isPlaying
+			)
 				return
-			if (!isPlaying) return
 
 			const updateGrid = () => {
 				const updatedGrid = generateUpdatedGrid(
@@ -144,7 +147,7 @@ export const GameGrid: FC<GameGridProps> = ({
 				canvas.removeEventListener('contextmenu', disableContextMenu)
 			}
 		},
-		[canvas, ctx, tileSize]
+		[canvas, ctx, tileSize, grid.length]
 	)
 
 	return null
